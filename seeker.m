@@ -1,0 +1,48 @@
+cam=videoinput('winvideo');
+ser=serial('COM1','BaudRate',9600);
+preview(cam);
+while(1)
+    f=getsnapshot(cam);
+    f=ycbcr2rgb(f);
+    l=f(:,:,1);
+    w=0;
+    s=0;
+    c=0;
+    for m=1:120
+        for n=1:160
+            if(l(m,n)>=230)
+                w=w+j;
+                s=s+i;
+                c=c+1;
+            end
+        end
+    end
+    w=w/c;
+    s=s/c;
+    if(w~=80 || s~=60)
+        if(w<80)
+            fopen(ser);
+            fwrite(ser,'a','uchar');
+            fclose(ser); 
+        end
+        if(w>80)
+            fopen(ser);
+            fwrite(ser,'d','uchar');
+            fclose(ser); 
+        end
+        if(s<60)
+            fopen(ser);
+            fwrite(ser,'s','uchar');
+            fclose(ser); 
+        end
+        if(s>60)
+            fopen(ser);
+            fwrite(ser,'w','uchar');
+            fclose(ser); 
+        end
+    else
+        fopen(ser);
+        fwrite(ser,'x','uchar');
+        fclose(ser); 
+    end  
+end
